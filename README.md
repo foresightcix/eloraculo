@@ -54,8 +54,8 @@ directamente.
 7. ¡Listo! Cada vez que alguien complete el oráculo, se agregará una fila a
    la pestaña **Respuestas** con estas columnas:
 
-   | Nombre | Arquetipo |
-   |---|---|
+   | Fecha/Hora | Nombre | Arquetipo | Nombre interno | Figura celeste | Segundo arquetipo | Definición (%) | Coord X | Coord Y | Respuestas (raw) |
+   |---|---|---|---|---|---|---|---|---|---|
 
 > **Verificar el despliegue:** abre la URL `/exec` en el navegador. Debe
 > responder `{"ok":true,"service":"El Oráculo",...}`.
