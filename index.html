@@ -81,10 +81,9 @@
   .crest svg{width:100%;height:100%}
   .greet{font-family:var(--font-sans);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--paper-dim);margin-bottom:10px}
   .greet b{color:var(--paper)}
-  .celeste{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:18px;color:var(--brand-orange);letter-spacing:.04em;margin-bottom:2px}
   .lineage{font-family:var(--font-sans);font-weight:900;font-size:clamp(40px,9.5vw,76px);line-height:.96;letter-spacing:-.02em;margin-bottom:10px;background:linear-gradient(100deg,#fff 10%,var(--brand-orange));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .epithet{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:clamp(18px,3.4vw,23px);color:var(--paper-dim);margin-bottom:14px}
-  .taghint{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-orange);opacity:.82;margin-bottom:26px}
+  .epithet{margin-bottom:26px}
   .scroll{font-size:16px;line-height:1.72;max-width:520px;margin:0 auto 18px;color:var(--paper);font-weight:400}
   .gift{max-width:520px;margin:0 auto 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;text-align:left;display:flex;flex-direction:column;gap:14px}
   .gline{display:flex;flex-direction:column;gap:5px}
@@ -367,6 +366,7 @@ function result(){
   const defn=Math.min(100,Math.round(Math.hypot(x,y)/Math.SQRT2*100));
   const map={SEMBRADORES:"Pequeños Socios",GUARDIANES:"Protegidos",EXPLORADORES:"Dinámicos",SOÑADORES:"Ilusionistas"};
   window.__research={nombre:playerName,publico:win.n,interno:map[win.n],coord:{x:+x.toFixed(3),y:+y.toFixed(3)},segundo:sec.n,definicion:defn,raw:answers};
+  window.__winKey=winE.k;
 
   // Sincroniza con Google Sheets (no bloquea la UI)
   syncToSheet({
@@ -392,10 +392,8 @@ function result(){
     <div class="verdict">El cielo ha hablado</div>
     <div class="crest">${constellation(win,168)}</div>
     <div class="greet">Para <b>${esc(playerName)}</b> y su familia</div>
-    <div class="celeste">${win.celeste}</div>
     <div class="lineage">LOS ${win.n}</div>
     <div class="epithet">${win.epi}</div>
-    <div class="taghint">${win.tag}</div>
     <p class="scroll">${win.scroll}</p>
     <div class="gift">
       <div class="gline"><span class="glab">Su luz</span><p class="gtxt">${win.luz}</p></div>
@@ -425,8 +423,101 @@ function syncToSheet(data){
 }
 
 function share(){
-  const t=`El cielo lo confirma: mi familia nació bajo LOS ${window.__research.publico}. ¿Y la tuya?`;
-  navigator.clipboard.writeText(t).then(()=>{const b=document.querySelector('.btn.ghost');const o=b.textContent;b.textContent='Copiado ✦';setTimeout(()=>b.textContent=o,1700);});
+  const win=ARQ[window.__winKey];
+  const b=document.querySelector('.btn.ghost');
+  const orig=b?b.textContent:'';
+  const txt=`El cielo lo confirma: mi familia nació bajo LOS ${win.n}. Descubre la constelación de la tuya:`;
+  const url='https://foresightcix.github.io/eloraculo/';
+  const done=(m)=>{ if(!b)return; b.disabled=false; b.textContent=m; setTimeout(()=>b.textContent=orig,2300); };
+  const reset=()=>{ if(!b)return; b.disabled=false; b.textContent=orig; };
+  if(b){ b.disabled=true; b.textContent='Creando imagen…'; }
+  buildShareCard(win,playerName).then(async (blob)=>{
+    const file=new File([blob],'mi-constelacion.png',{type:'image/png'});
+    // 1) Compartir nativo con imagen (móvil)
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file],text:txt,url}); done('¡Compartido! ✦'); return; }
+      catch(e){ if(e && e.name==='AbortError'){ reset(); return; } }
+    }
+    // 2) Escritorio: descarga la imagen + copia el texto
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='mi-constelacion.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    try{ await navigator.clipboard.writeText(txt+' '+url); }catch(e){}
+    done('Imagen lista ✦');
+  }).catch(()=>{
+    try{ navigator.clipboard.writeText(txt+' '+url); }catch(e){}
+    done('Texto copiado ✦');
+  });
+}
+
+function buildShareCard(win,name){
+  return new Promise((resolve)=>{
+    const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const x=cv.getContext('2d');
+    const FS='"Segoe UI", system-ui, -apple-system, sans-serif';
+    // Fondo
+    const g=x.createRadialGradient(W/2,H*0.08,40,W/2,H*0.08,H*1.05);
+    g.addColorStop(0,'#15205e');g.addColorStop(.42,'#0B1138');g.addColorStop(1,'#06081C');
+    x.fillStyle=g;x.fillRect(0,0,W,H);
+    // Estrellas de fondo
+    for(let k=0;k<170;k++){
+      const sx=Math.random()*W,sy=Math.random()*H,r=Math.random()*1.6+.3;
+      x.globalAlpha=.25+Math.random()*.55;
+      x.fillStyle=Math.random()<.18?'#FF7F32':'#FFD9B8';
+      x.beginPath();x.arc(sx,sy,r,0,7);x.fill();
+    }
+    x.globalAlpha=1;x.textAlign='center';
+    // Marca
+    x.fillStyle='#FF7F32';x.font='700 26px '+FS;
+    x.fillText('E L   O R Á C U L O',W/2,118);
+    // Constelación
+    drawConstelCanvas(x,win,W/2,350,360);
+    // Para X y su familia
+    x.fillStyle='#A9A6D6';x.font='500 34px '+FS;
+    x.fillText(`Para ${name} y su familia`,W/2,632);
+    // LOS
+    x.fillStyle='#F4F2FB';x.font='800 54px '+FS;
+    x.fillText('LOS',W/2,712);
+    // Nombre grande (auto-fit) con degradado
+    let fs=152;const maxW=W-130;
+    do{ fs-=4; x.font='900 '+fs+'px '+FS; }while(x.measureText(win.n).width>maxW && fs>60);
+    const grad=x.createLinearGradient(140,0,W-140,0);
+    grad.addColorStop(0,'#ffffff');grad.addColorStop(1,'#FF7F32');
+    x.fillStyle=grad;
+    const nameY=712+fs*0.92;
+    x.fillText(win.n,W/2,nameY);
+    // Epígrafe (italic, dim, máx 3 líneas)
+    x.fillStyle='#C9C6E8';x.font='italic 500 36px '+FS;
+    let yy=nameY+78;
+    wrapText(x,win.epi,W-200).slice(0,3).forEach(l=>{ x.fillText(l,W/2,yy); yy+=50; });
+    // CTA inferior
+    x.fillStyle='#A9A6D6';x.font='500 30px '+FS;
+    x.fillText('Descubre la constelación de tu familia',W/2,H-128);
+    x.fillStyle='#FF7F32';x.font='700 32px '+FS;
+    x.fillText('foresightcix.github.io/eloraculo',W/2,H-78);
+    cv.toBlob(bl=>resolve(bl),'image/png');
+  });
+}
+
+function drawConstelCanvas(x,win,cx,cy,box){
+  const pad=box*0.1,sc=(box-2*pad)/100;
+  const PX=v=>cx-box/2+pad+v*sc, PY=v=>cy-box/2+pad+v*sc;
+  x.save();
+  x.strokeStyle='rgba(255,127,50,.55)';x.lineWidth=2.5;
+  win.links.forEach(([a,b])=>{const A=win.stars[a],B=win.stars[b];
+    x.beginPath();x.moveTo(PX(A[0]),PY(A[1]));x.lineTo(PX(B[0]),PY(B[1]));x.stroke();});
+  win.stars.forEach(s=>{const r=[0,4,6.5,9][s[2]]||5.5;
+    x.beginPath();x.fillStyle='rgba(255,181,125,.18)';x.arc(PX(s[0]),PY(s[1]),r+9,0,7);x.fill();
+    x.beginPath();x.fillStyle='#FFB57D';x.arc(PX(s[0]),PY(s[1]),r,0,7);x.fill();});
+  x.restore();
+}
+
+function wrapText(x,text,maxW){
+  const words=String(text).split(' ');const lines=[];let line='';
+  for(const w of words){const t=line?line+' '+w:w;
+    if(x.measureText(t).width>maxW && line){lines.push(line);line=w;}else line=t;}
+  if(line)lines.push(line);return lines;
 }
 function restart(){i=0;answers=[];SCENES.forEach(s=>s._shown=false);intro();window.scrollTo({top:0,behavior:'smooth'});}
 
