@@ -86,8 +86,10 @@
   .epithet{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:clamp(18px,3.4vw,23px);color:var(--paper-dim);margin-bottom:14px}
   .taghint{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-orange);opacity:.82;margin-bottom:26px}
   .scroll{font-size:16px;line-height:1.72;max-width:520px;margin:0 auto 18px;color:var(--paper);font-weight:400}
-  .gift{font-size:15px;line-height:1.7;max-width:520px;margin:0 auto 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;text-align:left;font-weight:400;color:var(--paper-dim)}
-  .gift b{color:var(--brand-orange);font-weight:600}
+  .gift{max-width:520px;margin:0 auto 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;text-align:left;display:flex;flex-direction:column;gap:14px}
+  .gline{display:flex;flex-direction:column;gap:5px}
+  .glab{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--brand-orange)}
+  .gtxt{font-size:15.5px;line-height:1.5;color:var(--paper);font-weight:400}
   .kin{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:17px;color:var(--paper-dim);margin:6px 0 34px}
   .kin b{color:var(--paper)}
   .afhead{font-family:var(--font-sans);font-weight:800;font-size:21px;color:var(--paper);margin-bottom:18px;letter-spacing:-.01em}
@@ -139,32 +141,36 @@ const ARQ={
     celeste:"El Sembrador",
     epi:"Pones la semilla en sus manos y caminas a su lado mientras crece",
     tag:"Sueltas para que aprenda · Honras el tiempo de cada cosa",
-    scroll:"Lo tuyo no es guardar la semilla: es ponerla en las manos de quien la cuidará y enseñarle el cómo. Dejas decidir, dejas intentar, dejas equivocarse — porque sabes que un error pequeño hoy es una raíz fuerte mañana. No apuras la cosecha: la acompañas.",
-    gift:"<b>Tu luz:</b> crías a alguien capaz, que aprende haciendo y no teme probar. <b>El susurro del cielo:</b> tanto acompañar puede volverse vigilar — a veces la mejor lección es dejar la mano quieta y solo mirar.",
+    scroll:"En su hogar se aprende haciendo: dan espacio para intentar y equivocarse, y acompañan sin apurar. Confían en que cada cosa llega a su tiempo.",
+    luz:"Una familia que crece unida, segura y capaz.",
+    susurro:"Acompañar de más puede volverse vigilar; a veces basta con mirar.",
     stars:[[20,30,2],[38,22,3],[55,38,2],[50,60,3],[68,72,2],[40,80,1],[78,48,2]],
     links:[[0,1],[1,2],[2,3],[3,4],[3,5],[2,6]]},
   guardianes:{n:"GUARDIANES",x:-1,y:1,
     celeste:"El Guardián",
     epi:"Custodias la semilla en lugar seguro hasta que llegue su día",
     tag:"Proteges del riesgo · Honras el tiempo de cada cosa",
-    scroll:"Compartes con los Sembradores el amor por la paciencia, pero eliges un camino distinto: prefieres sostener tú el timón mientras el mundo afuera se calma. Le enseñas a esperar y a valorar, pero la decisión la guardas para ti — lo tuyo es un refugio donde nada malo entra antes de tiempo.",
-    gift:"<b>Tu luz:</b> le das raíces firmes y un hogar donde las buenas costumbres echan ancla. <b>El susurro del cielo:</b> el nido más fuerte es el que enseña a volar — prueba soltar de a poquito, siempre con red debajo.",
+    scroll:"Su hogar es un refugio. Cuidan cada paso y enseñan a esperar y a valorar, sosteniendo el timón hasta que llega el momento justo.",
+    luz:"Raíces firmes y un hogar donde todos están a salvo.",
+    susurro:"El nido más fuerte también enseña a volar: suelten de a poco, con red debajo.",
     stars:[[50,18,3],[30,34,2],[70,34,2],[26,58,2],[74,58,2],[50,50,1],[50,82,3]],
     links:[[0,1],[0,2],[1,3],[2,4],[3,6],[4,6],[0,5]]},
   exploradores:{n:"EXPLORADORES",x:1,y:-1,
     celeste:"El Navegante",
     epi:"Lanzas a tu hijo a la aventura y aprenden juntos sobre la marcha",
     tag:"Sueltas para que viva · Eliges el ahora, lleno de energía",
-    scroll:"Como los Sembradores, confías y sueltas — pero lo tuyo no es la espera, es el impulso. No esperas al mapa: lo dibujas andando. Donde hay ritmo, vida y descubrimiento, ahí estás, dejando que tu hijo se lance solo y contagiando una energía que prende el horizonte entero.",
-    gift:"<b>Tu luz:</b> crías un espíritu libre, curioso, que se atreve a todo. <b>El susurro del cielo:</b> hasta el navegante más audaz lleva una brújula — un pequeño plan hace que la aventura llegue mucho más lejos.",
+    scroll:"En su familia se vive con impulso. No esperan el mapa: lo dibujan andando, entre ritmo, descubrimiento y una energía que contagia.",
+    luz:"Una familia libre, curiosa y que se atreve a todo.",
+    susurro:"Hasta el navegante lleva brújula: un pequeño plan lleva la aventura más lejos.",
     stars:[[18,68,2],[34,50,3],[52,40,2],[66,26,3],[82,20,2],[58,58,1],[44,74,2]],
     links:[[0,1],[1,2],[2,3],[3,4],[2,5],[1,6]]},
   sonadores:{n:"SOÑADORES",x:-1,y:-1,
     celeste:"El Corazón",
     epi:"Haces del hoy un lugar cálido donde nadie se queda con las ganas",
     tag:"Resuelves con el corazón · Eliges el ahora, lleno de calidez",
-    scroll:"Compartes con los Exploradores el amor por el presente, pero el tuyo se vive desde el corazón: das, resuelves, complaces, porque una sonrisa hoy te pesa más que mil mañanas inciertas. Tu hogar rebosa calidez y abundancia, y nadie a tu alrededor se queda nunca con las ganas.",
-    gift:"<b>Tu luz:</b> un amor inmenso y una casa donde todos se sienten queridos. <b>El susurro del cielo:</b> los lugares más bellos también se construyen — guardar un poquito para mañana es otra forma de amar.",
+    scroll:"En su hogar todo se vive desde el corazón: dan, resuelven y consienten. Una sonrisa hoy pesa más que mil mañanas, y la casa rebosa calidez.",
+    luz:"Un amor inmenso y una casa donde todos se sienten queridos.",
+    susurro:"Lo bello también se construye: guardar un poco para mañana es otra forma de amar.",
     stars:[[50,24,3],[32,40,2],[68,40,2],[24,62,2],[76,62,2],[38,78,2],[62,78,2]],
     links:[[0,1],[0,2],[1,3],[2,4],[3,5],[4,6],[5,6]]}
 };
@@ -172,7 +178,7 @@ const AFIN={
   sembradores:{
     sembradores:"Dos jardineros en el mismo huerto: se entienden con una mirada y multiplican la cosecha.",
     guardianes:"Comparten la paciencia; aprenden uno del otro a soltar un poco y a cuidar un poco más.",
-    exploradores:"Tú das raíces, el Navegante da alas: juntos, un hijo que se atreve sin perder el rumbo.",
+    exploradores:"Tú das raíces, el Navegante da alas: juntos, una familia que se atreve sin perder el rumbo.",
     sonadores:"Tú enseñas el cómo, el Corazón pone la calidez: una mezcla cálida y sólida a la vez."},
   guardianes:{
     sembradores:"Comparten la paciencia; el Sembrador te contagia a soltar, tú le recuerdas a cuidar.",
@@ -180,7 +186,7 @@ const AFIN={
     exploradores:"Polos que se atraen: el Navegante trae aire fresco, tú das el puerto seguro.",
     sonadores:"Ambos protegen a su modo; cuidado con consentir de más entre los dos — pongan una regla en común."},
   exploradores:{
-    sembradores:"Tú das alas, el Sembrador da raíces: un hijo que se atreve sin perder el rumbo.",
+    sembradores:"Tú das alas, el Sembrador da raíces: una familia que se atreve sin perder el rumbo.",
     guardianes:"Polos que se atraen: tú traes la aventura, el Guardián trae la calma que la sostiene.",
     exploradores:"Dos chispas juntas: pura energía y descubrimiento — solo recuerden llevar la brújula.",
     sonadores:"Comparten el amor por el ahora: una casa vibrante y cálida, con la espontaneidad por bandera."},
@@ -391,7 +397,10 @@ function result(){
     <div class="epithet">${win.epi}</div>
     <div class="taghint">${win.tag}</div>
     <p class="scroll">${win.scroll}</p>
-    <div class="gift">${win.gift}</div>
+    <div class="gift">
+      <div class="gline"><span class="glab">Su luz</span><p class="gtxt">${win.luz}</p></div>
+      <div class="gline"><span class="glab">El cielo susurra</span><p class="gtxt">${win.susurro}</p></div>
+    </div>
     <p class="kin">En tu cielo brilla también la luz de <b>los ${sec.n}</b>. Ninguna constelación brilla sola.</p>
     <div class="afhead">Cómo se acompañan en el cielo</div>
     <div class="aflist">${affRows}</div>
