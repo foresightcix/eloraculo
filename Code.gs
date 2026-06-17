@@ -5,8 +5,8 @@
  * (Extensiones ▸ Apps Script) y despliégalo como "Aplicación web".
  * Consulta el README.md, sección "Conectar con Google Sheets".
  *
- * Recibe los resultados del oráculo (vía POST) y agrega una fila
- * a la hoja. Crea automáticamente los encabezados la primera vez.
+ * Guarda el Nombre del participante y su Arquetipo (constelación)
+ * en la pestaña "Respuestas". Crea los encabezados la primera vez.
  */
 
 // Nombre de la pestaña donde se guardarán las respuestas.
@@ -14,16 +14,8 @@ var SHEET_NAME = 'Respuestas';
 
 // Columnas (en orden). El "key" debe coincidir con lo que envía index.html.
 var COLUMNS = [
-  { key: 'ts',                titulo: 'Fecha/Hora' },
-  { key: 'nombre',            titulo: 'Nombre' },
-  { key: 'arquetipo',         titulo: 'Arquetipo' },
-  { key: 'arquetipo_interno', titulo: 'Nombre interno' },
-  { key: 'celeste',           titulo: 'Figura celeste' },
-  { key: 'segundo',           titulo: 'Segundo arquetipo' },
-  { key: 'definicion',        titulo: 'Definición (%)' },
-  { key: 'x',                 titulo: 'Coord X' },
-  { key: 'y',                 titulo: 'Coord Y' },
-  { key: 'respuestas',        titulo: 'Respuestas (raw)' }
+  { key: 'nombre',    titulo: 'Nombre' },
+  { key: 'arquetipo', titulo: 'Arquetipo' }
 ];
 
 function doPost(e) {
