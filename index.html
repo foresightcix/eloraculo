@@ -181,25 +181,25 @@ const ARQ={
 };
 const AFIN={
   sembradores:{
-    sembradores:"Dos jardineros en el mismo huerto: se entienden con una mirada y multiplican la cosecha.",
-    guardianes:"Comparten la paciencia; aprenden uno del otro a soltar un poco y a cuidar un poco más.",
-    exploradores:"Tú das raíces, el Navegante da alas: juntos, una familia que se atreve sin perder el rumbo.",
-    sonadores:"Tú enseñas el cómo, el Corazón pone la calidez: una mezcla cálida y sólida a la vez."},
+    sembradores:"Tu familia y otra familia Sembradora sueltan y acompañan igual: se entienden con una mirada y se inspiran a crecer juntas.",
+    guardianes:"Con una familia Guardiana comparten la paciencia. Ustedes los animan a soltar un poco; ellos les recuerdan poner límites con cariño.",
+    exploradores:"Ante una familia Exploradora, ustedes ponen calma y raíces y ellos chispa y aventura: juntos enseñan a atreverse sin perder el rumbo.",
+    sonadores:"Con una familia Soñadora, ustedes aportan el cómo y el orden, y ellos la calidez: una mezcla cálida y firme a la vez."},
   guardianes:{
-    sembradores:"Comparten la paciencia; el Sembrador te contagia a soltar, tú le recuerdas a cuidar.",
-    guardianes:"Dos murallas que se reconocen: un refugio doble, sereno y firme como pocos.",
-    exploradores:"Polos que se atraen: el Navegante trae aire fresco, tú das el puerto seguro.",
-    sonadores:"Ambos protegen a su modo; cuidado con consentir de más entre los dos — pongan una regla en común."},
+    sembradores:"Con una familia Sembradora comparten la paciencia. Ellos los contagian de soltar; ustedes les recuerdan cuidar y proteger.",
+    guardianes:"Tu familia y otra familia Guardiana cuidan igual: un refugio doble, sereno y firme como pocos.",
+    exploradores:"Con una familia Exploradora son polos que se atraen: ellos traen movimiento y aire fresco; ustedes, el puerto seguro donde volver.",
+    sonadores:"Con una familia Soñadora, ambas cuidan con devoción. Ojo con consentir de más entre las dos: acuerden unos límites comunes."},
   exploradores:{
-    sembradores:"Tú das alas, el Sembrador da raíces: una familia que se atreve sin perder el rumbo.",
-    guardianes:"Polos que se atraen: tú traes la aventura, el Guardián trae la calma que la sostiene.",
-    exploradores:"Dos chispas juntas: pura energía y descubrimiento — solo recuerden llevar la brújula.",
-    sonadores:"Comparten el amor por el ahora: una casa vibrante y cálida, con la espontaneidad por bandera."},
+    sembradores:"Ante una familia Sembradora, ustedes dan alas y energía y ellos raíces y paciencia: una familia que se atreve sin perder el rumbo.",
+    guardianes:"Con una familia Guardiana son polos que se atraen: ustedes traen la aventura; ellos, la calma que la sostiene.",
+    exploradores:"Tu familia y otra familia Exploradora son pura chispa: energía y descubrimiento sin freno. Solo recuerden llevar una brújula.",
+    sonadores:"Con una familia Soñadora comparten el amor por el presente: una casa vibrante y cálida, espontánea y feliz."},
   sonadores:{
-    sembradores:"Tú pones la calidez, el Sembrador el cómo: una mezcla cálida y con estructura.",
-    guardianes:"Ambos cuidan con devoción; cuidado con consentir de más — una regla en común los equilibra.",
-    exploradores:"Comparten el amor por el presente: un hogar vibrante y lleno de vida, espontáneo y feliz.",
-    sonadores:"Dos corazones enormes bajo un techo: calidez sin límite — guarden juntos un poquito para mañana."}
+    sembradores:"Con una familia Sembradora, ustedes ponen la calidez y ellos el cómo y el orden: una mezcla cálida y con estructura.",
+    guardianes:"Con una familia Guardiana, ambas cuidan con devoción. Ojo con consentir de más: unos límites en común las equilibran.",
+    exploradores:"Con una familia Exploradora comparten el amor por el presente: un hogar lleno de vida, espontáneo y feliz.",
+    sonadores:"Tu familia y otra familia Soñadora son dos corazones enormes bajo un mismo cielo: calidez sin límite. Guarden juntas un poco para mañana."}
 };
 
 const SCENES=[
@@ -398,7 +398,7 @@ function renderResult(){
   const order=Object.keys(ARQ).filter(k=>k!==winKey).concat(winKey);
   const affRows=order.map(k=>{
     const other=ARQ[k], me=winKey, txt=AFIN[me][k];
-    const label=(k===me)?`Con otra familia ${win.celeste}`:`Con los ${other.n}`;
+    const label=(k===me)?`Otra familia como la tuya`:`Los ${other.n}`;
     return `<div class="afrow"><div class="afmini">${constellation(other,50)}</div><div class="aftxt"><span class="afname">${label}</span>${txt}</div></div>`;
   }).join('');
 
@@ -414,7 +414,7 @@ function renderResult(){
       <div class="gline"><span class="glab">El cielo susurra</span><p class="gtxt">${win.susurro}</p></div>
     </div>
     <p class="kin">En tu cielo brilla también la luz de <b>los ${sec.n}</b>. Ninguna constelación brilla sola.</p>
-    <div class="afhead">Cómo se acompañan en el cielo</div>
+    <div class="afhead">Cómo se lleva tu familia con las demás</div>
     <div class="aflist">${affRows}</div>
     <div class="actions">
       <button class="btn ghost" onclick="restart()">Mirar de nuevo</button>
