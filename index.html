@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El Oráculo · ¿Cuál es la constelación de tu familia?</title>
+<meta name="description" content="Descubre la constelación de tu familia: un oráculo que revela tu arquetipo de crianza.">
+
+<style>
+  :root{
+    --font-sans: 'Flexo','Flexo Medium','Flexo Bold', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --brand-blue:#0B1990;
+    --brand-purple:#7B24C5;
+    --brand-orange:#FF7F32;
+    --ink:#0A0D29;
+    --night:#06081C;
+    --night2:#0B1138;
+    --paper:#F4F2FB;
+    --paper-dim:#A9A6D6;
+    --line:rgba(123,36,197,.28);
+    --glow:rgba(255,127,50,.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--font-sans);
+    background:
+      radial-gradient(1300px 800px at 50% -12%, #15205e 0%, var(--night2) 42%, var(--night) 100%),
+      var(--night);
+    color:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  #sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .stage{position:relative;z-index:2;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:36px 22px;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
+  .wrap{width:100%;max-width:660px;text-align:center}
+
+  .topbar{position:fixed;top:0;left:0;right:0;height:2px;background:rgba(123,36,197,.18);z-index:50}
+  .topbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand-purple),var(--brand-orange));transition:width .6s cubic-bezier(.5,0,.1,1)}
+
+  .scene{animation:rise .65s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  .seal{width:150px;height:150px;margin:0 auto 40px;animation:breathe 6s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.07);opacity:1}}
+  .intro-h{font-family:var(--font-sans);font-weight:800;font-size:clamp(30px,6.4vw,50px);line-height:1.08;letter-spacing:-.02em;margin-bottom:30px;color:var(--paper)}
+  .intro-h em{font-style:normal;background:linear-gradient(100deg,var(--brand-orange),var(--brand-purple));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .whisper{font-size:13px;font-weight:500;letter-spacing:.42em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:46px}
+
+  .btn{font-family:var(--font-sans);font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;color:#fff;border:none;padding:17px 42px;border-radius:100px;background:linear-gradient(100deg,var(--brand-purple),var(--brand-blue));transition:transform .18s,box-shadow .25s;box-shadow:0 0 0 rgba(123,36,197,0)}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(123,36,197,.4)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn.ghost{background:transparent;color:var(--brand-orange);border:1px solid var(--line)}
+  .btn.ghost:hover{background:rgba(255,127,50,.08);box-shadow:none}
+
+  /* Captura de nombre */
+  .namebox{max-width:420px;margin:0 auto 30px}
+  .namelbl{display:block;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--brand-orange);margin-bottom:14px;opacity:.85}
+  .nameinput{width:100%;font-family:var(--font-sans);font-size:18px;font-weight:500;text-align:center;color:var(--paper);background:rgba(123,36,197,.08);border:1px solid var(--line);border-radius:100px;padding:16px 24px;outline:none;transition:border-color .2s,background .2s}
+  .nameinput::placeholder{color:var(--paper-dim);opacity:.6}
+  .nameinput:focus{border-color:var(--brand-purple);background:rgba(123,36,197,.16)}
+  .namehint{font-size:12px;color:var(--paper-dim);margin-top:12px;line-height:1.5;opacity:.7}
+
+  .era{animation:fade 1.4s ease both}
+  @keyframes fade{0%{opacity:0}25%{opacity:1}82%{opacity:1}100%{opacity:.55}}
+  .era .glyph{width:96px;height:96px;margin:0 auto 28px;opacity:.9}
+  .era p{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:clamp(21px,4vw,29px);line-height:1.4;color:var(--paper);max-width:480px;margin:0 auto}
+  .era small{display:block;margin-top:26px;font-size:11px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--brand-orange);opacity:.75}
+
+  .qmark{font-size:12px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--brand-orange);margin-bottom:18px}
+  .stele{font-family:var(--font-sans);font-weight:600;font-size:clamp(23px,4.3vw,32px);line-height:1.3;color:var(--paper);max-width:530px;margin:0 auto 8px}
+  .vision{width:200px;height:200px;max-width:55vw;max-height:55vw;margin:18px auto 22px}
+  .vision svg{width:100%;height:100%}
+  .opts{display:flex;flex-direction:column;gap:14px;max-width:520px;margin:0 auto}
+  .opt{position:relative;text-align:left;font-family:var(--font-sans);font-weight:400;cursor:pointer;background:rgba(123,36,197,.06);border:1px solid var(--line);border-radius:4px;padding:18px 22px 18px 54px;font-size:15.5px;line-height:1.45;color:var(--paper);transition:border-color .2s,background .2s,transform .14s}
+  .opt:before{content:"";position:absolute;left:22px;top:50%;transform:translateY(-50%);width:13px;height:13px;border:1px solid var(--brand-orange);border-radius:50%;transition:all .2s}
+  .opt:hover{border-color:var(--brand-purple);background:rgba(123,36,197,.16);transform:translateX(4px)}
+  .opt:hover:before{background:var(--brand-orange);box-shadow:0 0 12px var(--glow)}
+
+  .verdict{font-size:13px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--brand-orange);margin-bottom:20px}
+  .crest{width:168px;height:168px;max-width:46vw;max-height:46vw;margin:0 auto 14px}
+  .crest svg{width:100%;height:100%}
+  .greet{font-family:var(--font-sans);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--paper-dim);margin-bottom:10px}
+  .greet b{color:var(--paper)}
+  .celeste{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:18px;color:var(--brand-orange);letter-spacing:.04em;margin-bottom:2px}
+  .lineage{font-family:var(--font-sans);font-weight:900;font-size:clamp(40px,9.5vw,76px);line-height:.96;letter-spacing:-.02em;margin-bottom:10px;background:linear-gradient(100deg,#fff 10%,var(--brand-orange));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .epithet{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:clamp(18px,3.4vw,23px);color:var(--paper-dim);margin-bottom:14px}
+  .taghint{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-orange);opacity:.82;margin-bottom:26px}
+  .scroll{font-size:16px;line-height:1.72;max-width:520px;margin:0 auto 18px;color:var(--paper);font-weight:400}
+  .gift{font-size:15px;line-height:1.7;max-width:520px;margin:0 auto 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;text-align:left;font-weight:400;color:var(--paper-dim)}
+  .gift b{color:var(--brand-orange);font-weight:600}
+  .kin{font-family:var(--font-sans);font-weight:500;font-style:italic;font-size:17px;color:var(--paper-dim);margin:6px 0 34px}
+  .kin b{color:var(--paper)}
+  .afhead{font-family:var(--font-sans);font-weight:800;font-size:21px;color:var(--paper);margin-bottom:18px;letter-spacing:-.01em}
+  .aflist{display:flex;flex-direction:column;gap:2px;max-width:540px;margin:0 auto 32px}
+  .afrow{display:flex;align-items:center;gap:16px;text-align:left;padding:15px 4px;border-bottom:1px solid var(--line)}
+  .afrow:last-child{border-bottom:none}
+  .afmini{flex:0 0 50px;opacity:.92}
+  .aftxt{font-size:14.5px;line-height:1.5;color:var(--paper-dim);font-weight:400}
+  .afname{display:block;font-family:var(--font-sans);font-weight:600;font-size:15px;color:var(--brand-orange);margin-bottom:3px}
+  .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .savenote{font-size:11.5px;letter-spacing:.04em;color:var(--paper-dim);opacity:.7;margin-top:22px}
+
+  @media(max-width:560px){
+    .stage{padding:28px 18px}
+    .seal{width:120px;height:120px;margin-bottom:30px}
+    .whisper{margin-bottom:34px}
+    .opt{font-size:14.5px;padding:15px 18px 15px 48px}
+    .opt:hover{transform:none}
+    .stele{margin-bottom:6px}
+    .btn{padding:16px 34px}
+    .afmini{flex:0 0 42px}
+  }
+  @media(hover:none){
+    .opt:active{border-color:var(--brand-purple);background:rgba(123,36,197,.2)}
+    .opt:active:before{background:var(--brand-orange);box-shadow:0 0 12px var(--glow)}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="sky"></canvas>
+<div class="topbar"><i id="prog"></i></div>
+<div class="stage"><div class="wrap" id="app"></div></div>
+
+<script>
+/* ============================================================
+   CONFIGURACIÓN — Sincronización con Google Sheets
+   Pega aquí la URL del Web App de tu Google Apps Script.
+   Pasos en el README.md (sección "Conectar con Google Sheets").
+   Si lo dejas vacío, el oráculo funciona igual pero no guarda nada.
+   ============================================================ */
+const SHEET_ENDPOINT = "";
+
+/* Ejes ocultos: x +Agencia/-Control · y +Postergación/-Presión
+   SEMBRADORES(+,+) GUARDIANES(-,+) EXPLORADORES(+,-) SOÑADORES(-,-)
+   Voz: a UN padre o UNA madre (tú/tu hijo). Neutral: nunca dinero/banco/producto. */
+const ARQ={
+  sembradores:{n:"SEMBRADORES",x:1,y:1,
+    celeste:"El Sembrador",
+    epi:"Pones la semilla en sus manos y caminas a su lado mientras crece",
+    tag:"Sueltas para que aprenda · Honras el tiempo de cada cosa",
+    scroll:"Lo tuyo no es guardar la semilla: es ponerla en las manos de quien la cuidará y enseñarle el cómo. Dejas decidir, dejas intentar, dejas equivocarse — porque sabes que un error pequeño hoy es una raíz fuerte mañana. No apuras la cosecha: la acompañas.",
+    gift:"<b>Tu luz:</b> crías a alguien capaz, que aprende haciendo y no teme probar. <b>El susurro del cielo:</b> tanto acompañar puede volverse vigilar — a veces la mejor lección es dejar la mano quieta y solo mirar.",
+    stars:[[20,30,2],[38,22,3],[55,38,2],[50,60,3],[68,72,2],[40,80,1],[78,48,2]],
+    links:[[0,1],[1,2],[2,3],[3,4],[3,5],[2,6]]},
+  guardianes:{n:"GUARDIANES",x:-1,y:1,
+    celeste:"El Guardián",
+    epi:"Custodias la semilla en lugar seguro hasta que llegue su día",
+    tag:"Proteges del riesgo · Honras el tiempo de cada cosa",
+    scroll:"Compartes con los Sembradores el amor por la paciencia, pero eliges un camino distinto: prefieres sostener tú el timón mientras el mundo afuera se calma. Le enseñas a esperar y a valorar, pero la decisión la guardas para ti — lo tuyo es un refugio donde nada malo entra antes de tiempo.",
+    gift:"<b>Tu luz:</b> le das raíces firmes y un hogar donde las buenas costumbres echan ancla. <b>El susurro del cielo:</b> el nido más fuerte es el que enseña a volar — prueba soltar de a poquito, siempre con red debajo.",
+    stars:[[50,18,3],[30,34,2],[70,34,2],[26,58,2],[74,58,2],[50,50,1],[50,82,3]],
+    links:[[0,1],[0,2],[1,3],[2,4],[3,6],[4,6],[0,5]]},
+  exploradores:{n:"EXPLORADORES",x:1,y:-1,
+    celeste:"El Navegante",
+    epi:"Lanzas a tu hijo a la aventura y aprenden juntos sobre la marcha",
+    tag:"Sueltas para que viva · Eliges el ahora, lleno de energía",
+    scroll:"Como los Sembradores, confías y sueltas — pero lo tuyo no es la espera, es el impulso. No esperas al mapa: lo dibujas andando. Donde hay ritmo, vida y descubrimiento, ahí estás, dejando que tu hijo se lance solo y contagiando una energía que prende el horizonte entero.",
+    gift:"<b>Tu luz:</b> crías un espíritu libre, curioso, que se atreve a todo. <b>El susurro del cielo:</b> hasta el navegante más audaz lleva una brújula — un pequeño plan hace que la aventura llegue mucho más lejos.",
+    stars:[[18,68,2],[34,50,3],[52,40,2],[66,26,3],[82,20,2],[58,58,1],[44,74,2]],
+    links:[[0,1],[1,2],[2,3],[3,4],[2,5],[1,6]]},
+  sonadores:{n:"SOÑADORES",x:-1,y:-1,
+    celeste:"El Corazón",
+    epi:"Haces del hoy un lugar cálido donde nadie se queda con las ganas",
+    tag:"Resuelves con el corazón · Eliges el ahora, lleno de calidez",
+    scroll:"Compartes con los Exploradores el amor por el presente, pero el tuyo se vive desde el corazón: das, resuelves, complaces, porque una sonrisa hoy te pesa más que mil mañanas inciertas. Tu hogar rebosa calidez y abundancia, y nadie a tu alrededor se queda nunca con las ganas.",
+    gift:"<b>Tu luz:</b> un amor inmenso y una casa donde todos se sienten queridos. <b>El susurro del cielo:</b> los lugares más bellos también se construyen — guardar un poquito para mañana es otra forma de amar.",
+    stars:[[50,24,3],[32,40,2],[68,40,2],[24,62,2],[76,62,2],[38,78,2],[62,78,2]],
+    links:[[0,1],[0,2],[1,3],[2,4],[3,5],[4,6],[5,6]]}
+};
+const AFIN={
+  sembradores:{
+    sembradores:"Dos jardineros en el mismo huerto: se entienden con una mirada y multiplican la cosecha.",
+    guardianes:"Comparten la paciencia; aprenden uno del otro a soltar un poco y a cuidar un poco más.",
+    exploradores:"Tú das raíces, el Navegante da alas: juntos, un hijo que se atreve sin perder el rumbo.",
+    sonadores:"Tú enseñas el cómo, el Corazón pone la calidez: una mezcla cálida y sólida a la vez."},
+  guardianes:{
+    sembradores:"Comparten la paciencia; el Sembrador te contagia a soltar, tú le recuerdas a cuidar.",
+    guardianes:"Dos murallas que se reconocen: un refugio doble, sereno y firme como pocos.",
+    exploradores:"Polos que se atraen: el Navegante trae aire fresco, tú das el puerto seguro.",
+    sonadores:"Ambos protegen a su modo; cuidado con consentir de más entre los dos — pongan una regla en común."},
+  exploradores:{
+    sembradores:"Tú das alas, el Sembrador da raíces: un hijo que se atreve sin perder el rumbo.",
+    guardianes:"Polos que se atraen: tú traes la aventura, el Guardián trae la calma que la sostiene.",
+    exploradores:"Dos chispas juntas: pura energía y descubrimiento — solo recuerden llevar la brújula.",
+    sonadores:"Comparten el amor por el ahora: una casa vibrante y cálida, con la espontaneidad por bandera."},
+  sonadores:{
+    sembradores:"Tú pones la calidez, el Sembrador el cómo: una mezcla cálida y con estructura.",
+    guardianes:"Ambos cuidan con devoción; cuidado con consentir de más — una regla en común los equilibra.",
+    exploradores:"Comparten el amor por el presente: un hogar vibrante y lleno de vida, espontáneo y feliz.",
+    sonadores:"Dos corazones enormes bajo un techo: calidez sin límite — guarden juntos un poquito para mañana."}
+};
+
+const SCENES=[
+  { era:"En la era de los primeros cielos…", vision:"stars",
+    q:"Despiertas en una nave de piedra que surca las estrellas. Ante lo desconocido, tú…",
+    opts:[
+      {t:"Te entregas a la corriente del cosmos, sin preguntar hacia dónde te lleva.", v:[1,-1]},
+      {t:"Lees las constelaciones para trazar el rumbo antes de avanzar.", v:[-1,1]},
+    ]},
+  { era:null, vision:"seedglow",
+    q:"Un anciano te entrega una semilla de luz. Para que despierte su poder, tú…",
+    opts:[
+      {t:"La lanzas al viento estelar y confías en que el universo la haga brotar.", v:[1,-0.4]},
+      {t:"La guardas en tierra sagrada y la cuidas cada amanecer hasta verla crecer.", v:[-0.4,1]},
+    ]},
+  { era:"Cuando los ríos aún hablaban…", vision:"river",
+    q:"Un río ancestral separa tu camino del templo. Para cruzar, eliges…",
+    opts:[
+      {t:"Saltar de roca en roca sintiendo la corriente, sin pensarlo demasiado.", v:[1,-0.6]},
+      {t:"Buscar el puente de los antiguos, firme aunque tome más tiempo.", v:[-1,0.7]},
+    ]},
+  { era:null, vision:"orchard",
+    q:"En el huerto sagrado los frutos brillan, maduros e inmaduros por igual. Tú…",
+    opts:[
+      {t:"Pruebas de todos ahora, dejándote tentar por su resplandor.", v:[0.4,-1]},
+      {t:"Apartas los mejores para que maduren y guarden un sabor aún más profundo.", v:[0.3,1]},
+    ]},
+  { era:"Bajo la última luna de la dinastía…", vision:"lantern",
+    q:"Una niña del templo va a encender el fuego eterno. Tú…",
+    opts:[
+      {t:"La dejas encenderlo sola; si la llama tiembla, así aprende a dominarla.", v:[1,0.5]},
+      {t:"Lo enciendes por ella y se lo entregas ardiendo, para que no se queme.", v:[-1,0.4]},
+    ]},
+  { era:null, vision:"twopaths",
+    q:"Dos sendas suben al observatorio y el sol se oculta pronto. Eliges…",
+    opts:[
+      {t:"El atajo escarpado: llegas veloz aunque sin aliento.", v:[0.3,-1]},
+      {t:"La senda larga: sabes que la vista de los astros valdrá cada paso.", v:[0.2,1]},
+    ]},
+  { era:"En el consejo del fuego eterno…", vision:"fire",
+    q:"Alrededor de la fogata sagrada, alguien propone un juego de los antiguos. Tú…",
+    opts:[
+      {t:"Dejas que cada quien invente reglas sobre la marcha; lo sagrado es jugar.", v:[1,-0.3]},
+      {t:"Propones reglas claras primero, para que todos lo disfruten por igual.", v:[-0.6,0.6]},
+    ]},
+  { era:"Y al alba, antes de partir…", vision:"dawn",
+    q:"El oráculo te pide elegir un recuerdo para grabar en piedra. Guardas…",
+    opts:[
+      {t:"La libertad de no saber qué venía, y haberlo vivido de igual modo.", v:[0.8,-0.6]},
+      {t:"La calma de haber cuidado cada paso del viaje con tus propias manos.", v:[-0.8,0.7]},
+    ]},
+];
+
+let i=0, answers=[], playerName="";
+const app=document.getElementById('app'), prog=document.getElementById('prog');
+function setProg(p){prog.style.width=(p*100)+'%'}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+(function(){
+  const cv=document.getElementById('sky'),x=cv.getContext('2d');let w,h,stars;
+  function rs(){w=cv.width=innerWidth;h=cv.height=innerHeight;stars=[];const n=Math.min(160,Math.floor(w*h/8500));
+    for(let k=0;k<n;k++)stars.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.2,a:Math.random(),s:Math.random()*.015+.004,c:Math.random()<.18?'255,127,50':'255,217,184'});}
+  rs();addEventListener('resize',rs);
+  (function loop(){x.clearRect(0,0,w,h);for(const s of stars){s.a+=s.s;const tw=.35+Math.abs(Math.sin(s.a))*.65;
+    x.beginPath();x.arc(s.x,s.y,s.r,0,7);x.fillStyle='rgba('+s.c+','+(tw*.7)+')';x.fill();}requestAnimationFrame(loop);})();
+})();
+
+function vis(kind,size){
+  const O='#FF7F32',Ob='#FFA866',P='#7B24C5',Pb='#A95FE0';
+  const o=(inner)=>`<svg viewBox="0 0 200 200" width="${size}" height="${size}" fill="none" stroke="${O}" stroke-width="1.4">${inner}</svg>`;
+  switch(kind){
+    case'stars': return o(starburst(O,Ob));
+    case'seedglow': return o(`<circle cx="100" cy="110" r="34" stroke="${Ob}"/><path d="M100 76 C100 50 100 40 100 26" stroke="${P}"/><path d="M100 50 C84 44 74 34 72 22 C90 24 98 34 100 50Z" fill="${P}" fill-opacity=".25" stroke="${Pb}"/><path d="M100 60 C116 54 126 44 128 32 C110 34 102 44 100 60Z" fill="${P}" fill-opacity=".25" stroke="${Pb}"/>${ring(100,110,52)}`);
+    case'river': return o(`<path d="M28 60 C80 80 120 50 172 76" stroke="${Pb}"/><path d="M28 100 C80 122 120 90 172 116" stroke="${Pb}"/><path d="M28 140 C80 162 120 130 172 156" stroke="${Pb}"/>${dot(60,70,O)}${dot(110,103,Ob)}${dot(150,148,O)}`);
+    case'orchard': return o(`${ring(100,100,70)}${[0,1,2,3,4,5].map(k=>{const a=k*Math.PI/3,r=44;const cx=100+Math.cos(a)*r,cy=100+Math.sin(a)*r;return `<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="13" stroke="${k%2?Ob:P}"/>`;}).join('')}<circle cx="100" cy="100" r="9" fill="${Ob}" fill-opacity=".3" stroke="${Ob}"/>`);
+    case'lantern': return o(`<rect x="80" y="64" width="40" height="56" rx="6" stroke="${O}"/><path d="M100 64 L100 50"/><circle cx="100" cy="92" r="13" fill="${O}" fill-opacity=".4" stroke="${Ob}"/><path d="M70 124 L130 124"/>${ring(100,92,64)}`);
+    case'twopaths': return o(`<path d="M100 170 C70 120 50 90 40 40" stroke="${O}"/><path d="M100 170 C130 120 150 90 160 40" stroke="${Pb}" stroke-dasharray="5 6"/><circle cx="40" cy="38" r="6" fill="${Ob}" stroke="${Ob}"/><circle cx="160" cy="38" r="6" stroke="${Pb}"/>`);
+    case'fire': return o(`<path d="M100 40 C120 78 138 92 138 122 A38 38 0 1 1 62 122 C62 96 78 84 100 40Z" fill="${O}" fill-opacity=".22" stroke="${O}"/><path d="M100 86 C110 104 118 112 118 126 A18 18 0 1 1 82 126 C82 114 90 106 100 86Z" fill="${Ob}" fill-opacity=".4" stroke="${Ob}"/>`);
+    case'dawn': return o(`<path d="M30 130 L170 130" stroke="${O}"/><circle cx="100" cy="130" r="40" stroke="${Ob}"/>${[...Array(7)].map((_,k)=>{const a=(k/6)*Math.PI;const x1=100+Math.cos(Math.PI+a)*52,y1=130+Math.sin(Math.PI+a)*52,x2=100+Math.cos(Math.PI+a)*68,y2=130+Math.sin(Math.PI+a)*68;return `<path d="M${x1.toFixed(0)} ${y1.toFixed(0)} L${x2.toFixed(0)} ${y2.toFixed(0)}" stroke="${Ob}"/>`;}).join('')}`);
+    default: return o(starburst(O,Ob));
+  }
+}
+function ring(cx,cy,r){return `<circle cx="${cx}" cy="${cy}" r="${r}" stroke-opacity=".3"/>`;}
+function dot(x,y,c){return `<circle cx="${x}" cy="${y}" r="4" fill="${c}" stroke="${c}"/>`;}
+function starburst(O,Ob){let s='';for(let k=0;k<16;k++){const a=k*Math.PI/8,r=k%2?72:40;const x=100+Math.cos(a)*r,y=100+Math.sin(a)*r;s+=(k?'L':'M')+x.toFixed(0)+' '+y.toFixed(0)+' ';}s+='Z';return `<path d="${s}" fill="${Ob}" fill-opacity=".12" stroke="${O}"/><circle cx="100" cy="100" r="10" fill="${Ob}" stroke="${Ob}"/>`;}
+
+function constellation(arq,size){
+  const O='#FF7F32',Ob='#FFB57D';
+  const pad=14, sc=(size-pad*2)/100, P=(v)=>(pad+v*sc).toFixed(1);
+  const lines=arq.links.map(([a,b])=>{const A=arq.stars[a],B=arq.stars[b];
+    return `<line x1="${P(A[0])}" y1="${P(A[1])}" x2="${P(B[0])}" y2="${P(B[1])}" stroke="${O}" stroke-width="1" stroke-opacity=".55" class="cl"/>`;}).join('');
+  const dots=arq.stars.map((s,k)=>{const r=[0,1.8,2.8,4][s[2]]||2.4;
+    return `<g class="cs" style="animation-delay:${k*0.12}s"><circle cx="${P(s[0])}" cy="${P(s[1])}" r="${r+5}" fill="${Ob}" fill-opacity=".14"/><circle cx="${P(s[0])}" cy="${P(s[1])}" r="${r}" fill="${Ob}" stroke="${Ob}" stroke-width=".5"/></g>`;}).join('');
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" class="constel">
+    <style>.constel .cl{stroke-dasharray:120;stroke-dashoffset:120;animation:draw 1s ease forwards}.constel .cs{opacity:0;animation:pop .5s ease forwards}@keyframes draw{to{stroke-dashoffset:0}}@keyframes pop{to{opacity:1}}</style>${lines}${dots}</svg>`;
+}
+function sealStars(size){
+  const Ob='#FFB57D',O='#FF7F32',pad=14,sc=(size-pad*2)/100,P=v=>(pad+v*sc).toFixed(1);
+  const pts=[[50,16],[28,38],[72,38],[20,68],[80,68],[50,54],[40,86],[62,84]];
+  const lk=[[0,1],[0,2],[1,3],[2,4],[1,5],[2,5],[3,6],[4,7]];
+  const ln=lk.map(([a,b])=>`<line x1="${P(pts[a][0])}" y1="${P(pts[a][1])}" x2="${P(pts[b][0])}" y2="${P(pts[b][1])}" stroke="${O}" stroke-width="1" stroke-opacity=".4"/>`).join('');
+  const dt=pts.map((p,k)=>`<circle cx="${P(p[0])}" cy="${P(p[1])}" r="${k%3?2.4:3.6}" fill="${Ob}" stroke="${Ob}"/>`).join('');
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${ln}${dt}</svg>`;
+}
+
+function intro(){
+  setProg(0);
+  app.innerHTML=`<div class="scene">
+    <div class="seal">${sealStars(150)}</div>
+    <div class="intro-h">Cada familia nace<br>bajo una <em>constelación</em>.</div>
+    <div class="whisper">¿ ya sabes cuál es la tuya ?</div>
+    <div class="namebox">
+      <label class="namelbl" for="pn">Antes de mirar al cielo, di tu nombre</label>
+      <input id="pn" class="nameinput" type="text" inputmode="text" autocomplete="name"
+             maxlength="60" placeholder="Tu nombre" value="${esc(playerName)}"
+             oninput="onName(this.value)" onkeydown="if(event.key==='Enter')begin()">
+      <div class="namehint">El oráculo grabará tu nombre junto a tu constelación.</div>
+    </div>
+    <button id="goBtn" class="btn" onclick="begin()" ${playerName.trim()?'':'disabled'}>Mirar al cielo</button>
+  </div>`;
+  const inp=document.getElementById('pn');
+  if(inp){ inp.focus(); }
+}
+function onName(v){
+  playerName=v;
+  const b=document.getElementById('goBtn');
+  if(b) b.disabled = !v.trim();
+}
+function begin(){
+  if(!playerName.trim()) return;
+  playerName=playerName.trim();
+  render();
+}
+
+function render(){
+  if(i>=SCENES.length) return result();
+  setProg(i/SCENES.length);
+  const s=SCENES[i];
+  if(s.era && !s._shown){
+    s._shown=true;
+    app.innerHTML=`<div class="era">
+      <div class="glyph">${vis(s.vision,96)}</div>
+      <p>${s.era}</p>
+      <small>el cielo observa en silencio</small>
+    </div>`;
+    setTimeout(()=>paintScene(s),3200);
+    return;
+  }
+  paintScene(s);
+}
+function paintScene(s){
+  app.innerHTML=`<div class="scene">
+    <div class="qmark">Visión ${roman(i+1)} de ${roman(SCENES.length)}</div>
+    <div class="stele">${s.q}</div>
+    <div class="vision">${vis(s.vision,200)}</div>
+    <div class="opts">
+      ${s.opts.map((o,k)=>`<button class="opt" onclick="pick(${k})">${o.t}</button>`).join('')}
+    </div>
+  </div>`;
+}
+function pick(k){answers.push(SCENES[i].opts[k].v);i++;render();window.scrollTo({top:0,behavior:'smooth'});}
+function roman(n){return['','I','II','III','IV','V','VI','VII','VIII'][n]||n;}
+
+function result(){
+  setProg(1);
+  let x=0,y=0;answers.forEach(v=>{x+=v[0];y+=v[1]});
+  const n=answers.length;x/=n;y/=n;
+  const ranked=Object.entries(ARQ).map(([k,a])=>({k,a,d:Math.hypot(x-a.x,y-a.y)})).sort((p,q)=>p.d-q.d);
+  const winE=ranked[0], win=winE.a, sec=ranked[1].a;
+  const defn=Math.min(100,Math.round(Math.hypot(x,y)/Math.SQRT2*100));
+  const map={SEMBRADORES:"Pequeños Socios",GUARDIANES:"Protegidos",EXPLORADORES:"Dinámicos",SOÑADORES:"Ilusionistas"};
+  window.__research={nombre:playerName,publico:win.n,interno:map[win.n],coord:{x:+x.toFixed(3),y:+y.toFixed(3)},segundo:sec.n,definicion:defn,raw:answers};
+
+  // Sincroniza con Google Sheets (no bloquea la UI)
+  syncToSheet({
+    nombre: playerName,
+    arquetipo: win.n,
+    arquetipo_interno: map[win.n],
+    celeste: win.celeste,
+    segundo: sec.n,
+    definicion: defn,
+    x: +x.toFixed(3),
+    y: +y.toFixed(3),
+    respuestas: JSON.stringify(answers)
+  });
+
+  const order=Object.keys(ARQ).filter(k=>k!==winE.k).concat(winE.k);
+  const affRows=order.map(k=>{
+    const other=ARQ[k], me=winE.k, txt=AFIN[me][k];
+    const label=(k===me)?`Con otra familia ${win.celeste}`:`Con los ${other.n}`;
+    return `<div class="afrow"><div class="afmini">${constellation(other,50)}</div><div class="aftxt"><span class="afname">${label}</span>${txt}</div></div>`;
+  }).join('');
+
+  app.innerHTML=`<div class="scene">
+    <div class="verdict">El cielo ha hablado</div>
+    <div class="crest">${constellation(win,168)}</div>
+    <div class="greet">Para <b>${esc(playerName)}</b> y su familia</div>
+    <div class="celeste">${win.celeste}</div>
+    <div class="lineage">LOS ${win.n}</div>
+    <div class="epithet">${win.epi}</div>
+    <div class="taghint">${win.tag}</div>
+    <p class="scroll">${win.scroll}</p>
+    <div class="gift">${win.gift}</div>
+    <p class="kin">En tu cielo brilla también la luz de <b>los ${sec.n}</b>. Ninguna constelación brilla sola.</p>
+    <div class="afhead">Cómo se acompañan en el cielo</div>
+    <div class="aflist">${affRows}</div>
+    <div class="actions">
+      <button class="btn" onclick="restart()">Mirar de nuevo</button>
+      <button class="btn ghost" onclick="share()">Proclamar tu constelación</button>
+    </div>
+    <div class="savenote">${SHEET_ENDPOINT?'✦ Tu constelación quedó grabada en el cielo.':''}</div>
+  </div>`;
+}
+
+function syncToSheet(data){
+  if(!SHEET_ENDPOINT) return;
+  try{
+    fetch(SHEET_ENDPOINT,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({...data, ts:new Date().toISOString()})
+    }).catch(e=>console.warn('Oráculo · sync falló:',e));
+  }catch(e){console.warn('Oráculo · sync falló:',e);}
+}
+
+function share(){
+  const t=`El cielo lo confirma: mi familia nació bajo LOS ${window.__research.publico}. ¿Y la tuya?`;
+  navigator.clipboard.writeText(t).then(()=>{const b=document.querySelector('.btn.ghost');const o=b.textContent;b.textContent='Copiado ✦';setTimeout(()=>b.textContent=o,1700);});
+}
+function restart(){i=0;answers=[];SCENES.forEach(s=>s._shown=false);intro();window.scrollTo({top:0,behavior:'smooth'});}
+
+intro();
+</script>
+</body>
+</html>
