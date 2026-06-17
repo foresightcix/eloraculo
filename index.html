@@ -101,6 +101,19 @@
   .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
   .savenote{font-size:11.5px;letter-spacing:.04em;color:var(--paper-dim);opacity:.7;margin-top:22px}
 
+  /* Pantalla de compartir */
+  .loadmsg{font-style:italic;font-size:18px;color:var(--paper-dim);margin:60px 0}
+  .cardimg{display:block;width:min(320px,74vw);margin:8px auto 26px;border-radius:18px;border:1px solid var(--line);box-shadow:0 22px 64px rgba(0,0,0,.55)}
+  .social{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:460px;margin:24px auto 0}
+  .soc{flex:0 0 auto;text-decoration:none;font-family:var(--font-sans);font-size:13px;font-weight:600;letter-spacing:.04em;color:#fff;border:1px solid var(--line);border-radius:100px;padding:12px 22px;transition:transform .15s,box-shadow .25s,background .2s;background:rgba(123,36,197,.14)}
+  .soc:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.35)}
+  .soc.wa:hover{background:rgba(37,211,102,.22);border-color:rgba(37,211,102,.5)}
+  .soc.fb:hover{background:rgba(24,119,242,.22);border-color:rgba(24,119,242,.5)}
+  .soc.xt:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4)}
+  .soc.tg:hover{background:rgba(42,171,238,.22);border-color:rgba(42,171,238,.5)}
+  .sochint{font-size:12.5px;line-height:1.6;color:var(--paper-dim);opacity:.78;max-width:420px;margin:18px auto 0}
+  .backlink{margin-top:28px}
+
   @media(max-width:560px){
     .stage{padding:28px 18px}
     .seal{width:120px;height:120px;margin-bottom:30px}
@@ -357,18 +370,20 @@ function paintScene(s){
 function pick(k){answers.push(SCENES[i].opts[k].v);i++;render();window.scrollTo({top:0,behavior:'smooth'});}
 function roman(n){return['','I','II','III','IV','V','VI','VII','VIII'][n]||n;}
 
+let resultData=null, shareBlob=null, shareUrl='';
+
 function result(){
-  setProg(1);
   let x=0,y=0;answers.forEach(v=>{x+=v[0];y+=v[1]});
   const n=answers.length;x/=n;y/=n;
   const ranked=Object.entries(ARQ).map(([k,a])=>({k,a,d:Math.hypot(x-a.x,y-a.y)})).sort((p,q)=>p.d-q.d);
   const winE=ranked[0], win=winE.a, sec=ranked[1].a;
   const defn=Math.min(100,Math.round(Math.hypot(x,y)/Math.SQRT2*100));
   const map={SEMBRADORES:"Pequeños Socios",GUARDIANES:"Protegidos",EXPLORADORES:"Dinámicos",SOÑADORES:"Ilusionistas"};
+  resultData={win, sec, winKey:winE.k};
   window.__research={nombre:playerName,publico:win.n,interno:map[win.n],coord:{x:+x.toFixed(3),y:+y.toFixed(3)},segundo:sec.n,definicion:defn,raw:answers};
   window.__winKey=winE.k;
 
-  // Sincroniza con Google Sheets (no bloquea la UI)
+  // Sincroniza con Google Sheets una sola vez (no bloquea la UI)
   syncToSheet({
     nombre: playerName,
     arquetipo: win.n,
@@ -381,9 +396,15 @@ function result(){
     respuestas: JSON.stringify(answers)
   });
 
-  const order=Object.keys(ARQ).filter(k=>k!==winE.k).concat(winE.k);
+  renderResult();
+}
+
+function renderResult(){
+  setProg(1);
+  const {win, sec, winKey}=resultData;
+  const order=Object.keys(ARQ).filter(k=>k!==winKey).concat(winKey);
   const affRows=order.map(k=>{
-    const other=ARQ[k], me=winE.k, txt=AFIN[me][k];
+    const other=ARQ[k], me=winKey, txt=AFIN[me][k];
     const label=(k===me)?`Con otra familia ${win.celeste}`:`Con los ${other.n}`;
     return `<div class="afrow"><div class="afmini">${constellation(other,50)}</div><div class="aftxt"><span class="afname">${label}</span>${txt}</div></div>`;
   }).join('');
@@ -403,8 +424,8 @@ function result(){
     <div class="afhead">Cómo se acompañan en el cielo</div>
     <div class="aflist">${affRows}</div>
     <div class="actions">
-      <button class="btn" onclick="restart()">Mirar de nuevo</button>
-      <button class="btn ghost" onclick="share()">Proclamar tu constelación</button>
+      <button class="btn ghost" onclick="restart()">Mirar de nuevo</button>
+      <button class="btn" onclick="share()">Proclamar tu constelación</button>
     </div>
     <div class="savenote">${SHEET_ENDPOINT?'✦ Tu constelación quedó grabada en el cielo.':''}</div>
   </div>`;
@@ -422,33 +443,61 @@ function syncToSheet(data){
   }catch(e){console.warn('Oráculo · sync falló:',e);}
 }
 
+const SHARE_URL='https://foresightcix.github.io/eloraculo/';
+function shareText(win){ return `El cielo lo confirma: mi familia nació bajo LOS ${win.n}. Descubre la constelación de la tuya:`; }
+
+// Pantalla dedicada para compartir: muestra la imagen y las opciones.
 function share(){
-  const win=ARQ[window.__winKey];
-  const b=document.querySelector('.btn.ghost');
-  const orig=b?b.textContent:'';
-  const txt=`El cielo lo confirma: mi familia nació bajo LOS ${win.n}. Descubre la constelación de la tuya:`;
-  const url='https://foresightcix.github.io/eloraculo/';
-  const done=(m)=>{ if(!b)return; b.disabled=false; b.textContent=m; setTimeout(()=>b.textContent=orig,2300); };
-  const reset=()=>{ if(!b)return; b.disabled=false; b.textContent=orig; };
-  if(b){ b.disabled=true; b.textContent='Creando imagen…'; }
-  buildShareCard(win,playerName).then(async (blob)=>{
-    const file=new File([blob],'mi-constelacion.png',{type:'image/png'});
-    // 1) Compartir nativo con imagen (móvil)
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      try{ await navigator.share({files:[file],text:txt,url}); done('¡Compartido! ✦'); return; }
-      catch(e){ if(e && e.name==='AbortError'){ reset(); return; } }
-    }
-    // 2) Escritorio: descarga la imagen + copia el texto
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob); a.download='mi-constelacion.png';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-    try{ await navigator.clipboard.writeText(txt+' '+url); }catch(e){}
-    done('Imagen lista ✦');
-  }).catch(()=>{
-    try{ navigator.clipboard.writeText(txt+' '+url); }catch(e){}
-    done('Texto copiado ✦');
-  });
+  const win=resultData.win;
+  setProg(1);
+  app.innerHTML=`<div class="scene">
+    <div class="verdict">Comparte tu constelación</div>
+    <p class="loadmsg">Dibujando tu cielo…</p>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+  buildShareCard(win,playerName).then(blob=>{
+    if(shareUrl) URL.revokeObjectURL(shareUrl);
+    shareBlob=blob; shareUrl=URL.createObjectURL(blob);
+    renderProclaim(win);
+  }).catch(()=>renderResult());
+}
+
+function renderProclaim(win){
+  const txt=shareText(win), url=SHARE_URL, e=encodeURIComponent, tu=e(txt+' '+url);
+  let canFile=false;
+  try{ canFile=!!(navigator.canShare && navigator.canShare({files:[new File([shareBlob],'c.png',{type:'image/png'})]})); }catch(_){}
+  app.innerHTML=`<div class="scene">
+    <div class="verdict">Comparte tu constelación</div>
+    <img class="cardimg" src="${shareUrl}" alt="Tu constelación: LOS ${win.n}">
+    <div class="actions">
+      <button class="btn" onclick="downloadCard(this)">Descargar imagen</button>
+      ${canFile?`<button class="btn ghost" onclick="nativeShare()">Compartir…</button>`:''}
+    </div>
+    <div class="social">
+      <a class="soc wa" target="_blank" rel="noopener" href="https://wa.me/?text=${tu}">WhatsApp</a>
+      <a class="soc fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${e(url)}&quote=${e(txt)}">Facebook</a>
+      <a class="soc xt" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${e(txt)}&url=${e(url)}">X</a>
+      <a class="soc tg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${e(url)}&text=${e(txt)}">Telegram</a>
+    </div>
+    <div class="sochint">Descarga la imagen para subirla a tus historias de Instagram o estado de WhatsApp; los botones de redes invitan a tu familia con el enlace al test.</div>
+    <button class="btn ghost backlink" onclick="renderResult()">← Volver al resultado</button>
+  </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function downloadCard(btn){
+  if(!shareBlob) return;
+  const a=document.createElement('a');
+  a.href=shareUrl; a.download='mi-constelacion.png';
+  document.body.appendChild(a); a.click(); a.remove();
+  if(btn){ const o=btn.textContent; btn.textContent='Descargada ✦'; setTimeout(()=>btn.textContent=o,2000); }
+}
+
+async function nativeShare(){
+  if(!shareBlob) return;
+  const win=resultData.win;
+  const file=new File([shareBlob],'mi-constelacion.png',{type:'image/png'});
+  try{ await navigator.share({files:[file],text:shareText(win),url:SHARE_URL}); }catch(_){}
 }
 
 function buildShareCard(win,name){
@@ -519,7 +568,7 @@ function wrapText(x,text,maxW){
     if(x.measureText(t).width>maxW && line){lines.push(line);line=w;}else line=t;}
   if(line)lines.push(line);return lines;
 }
-function restart(){i=0;answers=[];SCENES.forEach(s=>s._shown=false);intro();window.scrollTo({top:0,behavior:'smooth'});}
+function restart(){i=0;answers=[];resultData=null;if(shareUrl){URL.revokeObjectURL(shareUrl);shareUrl='';}shareBlob=null;SCENES.forEach(s=>s._shown=false);intro();window.scrollTo({top:0,behavior:'smooth'});}
 
 intro();
 </script>
